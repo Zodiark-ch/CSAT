@@ -5,9 +5,9 @@
 [![preprint](https://img.shields.io/badge/arXiv-2410.07163-B31B1B)]()
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue)](https://github.com/OPTML-Group/WAGLE)
-[![GitHub top language](https://img.shields.io/github/languages/top/OPTML-Group/Unlearn-Simple)](https://github.com/OPTML-Group/WAGLE)
-[![GitHub repo size](https://img.shields.io/github/repo-size/OPTML-Group/Unlearn-Simple)](https://github.com/OPTML-Group/WAGLE)
-[![GitHub stars](https://img.shields.io/github/stars/OPTML-Group/Unlearn-Simple)](https://github.com/OPTML-Group/WAGLE)
+[![GitHub top language](https://img.shields.io/github/languages/top/OPTML-Group/WAGLE)](https://github.com/OPTML-Group/WAGLE)
+[![GitHub repo size](https://img.shields.io/github/repo-size/OPTML-Group/WAGLE)](https://github.com/OPTML-Group/WAGLE)
+[![GitHub stars](https://img.shields.io/github/stars/OPTML-Group/WAGLE)](https://github.com/OPTML-Group/WAGLE)
 
 </div>
 
