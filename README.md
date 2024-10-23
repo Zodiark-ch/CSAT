@@ -2,8 +2,7 @@
  
 # WAGLE: Strategic Weight Attribution for Effective and Modular Unlearning in Large Language Models
 
-[![preprint](https://img.shields.io/badge/arXiv-2410.07163-B31B1B)]()
-[![issues](https://img.shields.io/badge/Issues-Welcome!-yellow)](https://github.com/OPTML-Group/WAGLE/issues)
+[![preprint](https://img.shields.io/badge/arXiv-TBA-B31B1B)]()
 
 [![Venue:NeurIPS 2024](https://img.shields.io/badge/Venue-NeurIPS%202024-blue)](https://neurips.cc/Conferences/2024)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue)](https://github.com/OPTML-Group/WAGLE?tab=MIT-1-ov-file)
