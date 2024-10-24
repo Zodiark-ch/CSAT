@@ -56,7 +56,7 @@ WAGLE+NPO: [🤗 flyingbugs/WMDP_NPO_WAGLE_Zephyr_7B](https://huggingface.co/fly
 -- configs/: Contains the configuration files for the experiments.
     -- Different folders for different experiments (Tofu, WMDP, etc.)
 -- files/: 
-    -- data/: Contains the data files nessary for the experiments.
+    -- data/: Contains the data files necessary for the experiments.
     -- results/: the log and results of experiments will stored in this directory.
 -- lm-evaluation-harness: official repository for the evaluation of LLMs from      
   https://github.com/EleutherAI/lm-evaluation-harness.
