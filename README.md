@@ -2,7 +2,7 @@
  
 # WAGLE: Strategic Weight Attribution for Effective and Modular Unlearning in Large Language Models
 
-[![preprint](https://img.shields.io/badge/arXiv-TBA-B31B1B)]()
+[![preprint](https://img.shields.io/badge/arXiv-TBA-B31B1B)](https://arxiv.org/pdf/2410.17509)
 
 [![Venue:NeurIPS 2024](https://img.shields.io/badge/Venue-NeurIPS%202024-blue)](https://neurips.cc/Conferences/2024)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue)](https://github.com/OPTML-Group/WAGLE?tab=MIT-1-ov-file)
@@ -12,7 +12,7 @@
 
 </div>
 
-This is the official code repository for the paper [WAGLE: Strategic Weight Attribution for Effective and Modular Unlearning in Large Language Models]().
+This is the official code repository for the paper [WAGLE: Strategic Weight Attribution for Effective and Modular Unlearning in Large Language Models](https://arxiv.org/pdf/2410.17509).
 
 ## Abstract
 
@@ -84,5 +84,13 @@ python src/exec/unlearn_model.py --config_file configs/{unlearn_task}/{unlearn_m
 
 <!---## Cite This Work
 ```
-
+@misc{jia2024waglestrategicweightattribution,
+      title={WAGLE: Strategic Weight Attribution for Effective and Modular Unlearning in Large Language Models}, 
+      author={Jinghan Jia and Jiancheng Liu and Yihua Zhang and Parikshit Ram and Nathalie Baracaldo and Sijia Liu},
+      year={2024},
+      eprint={2410.17509},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2410.17509}, 
+}
 ```!--->
