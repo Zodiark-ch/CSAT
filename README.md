@@ -74,7 +74,7 @@ WAGLE+NPO: [🤗 flyingbugs/WMDP_NPO_WAGLE_Zephyr_7B](https://huggingface.co/fly
 ```
 ## Running the experiments
 
-First, you need to download the mask files from Google Drive and place them into ```./mask/``` directory. You can download the mask files from [here](https://drive.google.com/drive/folders/1BuoYofYB_rq4Oa_t1ojtOsMJyB6nO3ND?usp=sharing). Those mask files name should be like ```{task_name}_{ratio}.pt```. For example, ```tofu_0.8.pt``` represents the mask file for TOFU task with 80% weights are selected for unlearning from WAGLE method.
+First, you need to download the mask files from Google Drive and place them into ```./mask/``` directory. You can download the mask files from [here](https://drive.google.com/drive/folders/1yYzvroNHNKWrNWk0WOX_j4pXw4kIyEyf?usp=sharing). Those mask files name should be like ```{task_name}_{ratio}.pt```. For example, ```tofu_0.8.pt``` represents the mask file for TOFU task with 80% weights are selected for unlearning from WAGLE method.
 
 After downloading the mask files, you can run the following command to run the experiments:
 ```
