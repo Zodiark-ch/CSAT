@@ -6,7 +6,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 sys.path.append("src")
 import torch
-from peft import  get_peft_model, LoraConfig, AdaLoraConfig, TaskType
+from peft import  get_peft_model, LoraConfig
 from pruner.utils import WrappedGPT, find_layers
 from dataset import get_dataset
 from metrics import (
@@ -89,9 +89,10 @@ class Unlearn:
         self.model.resize_token_embeddings(len(tokenizer))
         self.tokenizer = tokenizer
         try:
-            self.device = model.hf_device_map["lm_head"]
+            self.device = torch.device("musa:0")
+            #self.device = model.hf_device_map["lm_head"]
         except:
-            self.device = torch.device("cuda:0")
+            self.device = torch.device("musa:0")
 
     def init_dataset(self):
         unlearn_dataset, test_dataset, unlearn_collator, test_collator = get_dataset(

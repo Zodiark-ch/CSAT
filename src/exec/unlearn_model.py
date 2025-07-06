@@ -14,11 +14,12 @@ from fastargs.validation import BoolAsInt, File, Folder, OneOf
 sys.path.append("src")
 
 Section("overall", "Overall configs").params(
-    model_name=Param(str, required=True, desc="Model name"),
-    logger=Param(OneOf(["json", "none"]), default="none", desc="Logger to use"),
-    cache_dir=Param(Folder(True), default=".cache", desc="Cache directory"),
+    model_name=Param(str, required=True, default="locuslab/tofu_ft_llama2-7b", desc="Model name"),
+    logger=Param(OneOf(["json", "none"]), default="json", desc="Logger to use"),
+    cache_dir=Param(Folder(True), default="/root/autodl-tmp/.cache", desc="Cache directory"),
     seed=Param(int, default=0, desc="Random seed"),
 )
+
 
 Section("unlearn", "Unlearning configs").params(
     unlearn_method=Param(
@@ -38,30 +39,30 @@ Section("unlearn", "Unlearning configs").params(
                 "NPO+FT"
             ]
         ),
-        default="origin",
+        default="GA+FT",
         desc="Unlearning method",
     ),
-    num_epochs=Param(int, default=1, desc="Number of epochs to train"),
-    lr=Param(float, default=1e-4, desc="Learning rate"),
-    weight_decay=Param(float, default=0.0, desc="Weight decay"),
+    num_epochs=Param(int, default=5, desc="Number of epochs to train"),
+    lr=Param(float, default=7e-06, desc="Learning rate"),
+    weight_decay=Param(float, default=0.1, desc="Weight decay"),
     gradient_accumulation_steps=Param(
-        int, default=1, desc="Gradient accumulation steps"
+        int, default=4, desc="Gradient accumulation steps"
     ),
-    mask_path=Param(str, default=None, desc="Path to mask file"),
+    mask_path=Param(str, default="/root/autodl-tmp/wagle_mak/tofu_0.95-001.pt", desc="Path to mask file"),
     task_name=Param(
         OneOf(["toxic", "copyright", "tofu", "wmdp"]),
-        default="toxic",
+        default="tofu",
         desc="Task name",
     ),
     sophia=Param(BoolAsInt(), default=False, desc="Whether to use SOPHIA"),
-    p=Param(float, default=0.01, desc="p for snip_joint"),
-    q=Param(float, default=0.01, desc="q for snip_joint"),
+    p=Param(float, default=0.95, desc="p for snip_joint"),
+    q=Param(float, default=0.95, desc="q for snip_joint"),
     resume_path=Param(
         Folder(False), default=None, desc="Path to resume model for evaluation"
     ),
     max_steps=Param(int, default=-1, desc="Max steps for training"),
     use_lora=Param(BoolAsInt(), default=False, desc="Whether to use LoRA"),
-    mu=Param(float, default=1e-3, desc="hessian approximantion parameter"),
+    mu=Param(float, default=1e-06, desc="hessian approximantion parameter"),
 )
 
 Section("unlearn.sophia_params", "SOPHIA configs").enable_if(
@@ -103,7 +104,7 @@ Section("unlearn.CL+FT", "CL+FT unlearning configs").enable_if(
 Section("unlearn.GA+FT", "GA+FT unlearning configs").enable_if(
     lambda cfg: cfg["unlearn.unlearn_method"] == "GA+FT"
 ).params(
-    gamma=Param(float, default=0.0, desc="hyperparameters before GA loss"),
+    gamma=Param(float, default=1.0, desc="hyperparameters before GA loss"),
 )
 
 Section("unlearn.KL", "KL unlearning configs").enable_if(
@@ -115,12 +116,12 @@ Section("unlearn.KL", "KL unlearning configs").enable_if(
 )
 
 Section("dataset", "Dataset configs").params(
-    forget_dataset_name=Param(str, default="SafePku", desc="forget dataset name"),
-    retain_dataset_name=Param(str, default="TruthfulQA", desc="retain dataset name"),
-    dataset_seed=Param(int, default=0, desc="Dataset seed"),
-    forget_ratio=Param(float, default=200, desc="Forget ratio"),
+    forget_dataset_name=Param(str, default="Tofu_forget10", desc="forget dataset name"),
+    retain_dataset_name=Param(str, default="Tofu_retain90", desc="retain dataset name"),
+    dataset_seed=Param(int, default=1000, desc="Dataset seed"),
+    forget_ratio=Param(float, default=400, desc="Forget ratio"),
     self_retain=Param(BoolAsInt(), default=False, desc="Whether to retain self"),
-    batch_size=Param(int, default=16, desc="Batch size"),
+    batch_size=Param(int, default=1, desc="Batch size"),
 )
 
 Section("logger", "General logger configs").params(

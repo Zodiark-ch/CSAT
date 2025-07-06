@@ -11,7 +11,7 @@
         "lr": 1e-05,
         "weight_decay": 0.1,
         "gradient_accumulation_steps": 4,
-        "mask_path": "./mask/tofu_0.95.pt",
+        "mask_path": "/root/autodl-tmp/wagle_mak/tofu_0.95-001.pt",
         "task_name": "tofu",
         "sophia": false,
         "p": 0.95,

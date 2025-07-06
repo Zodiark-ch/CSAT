@@ -6,6 +6,7 @@ from time import time
 sys.path.append("src")
 import datasets
 import torch
+import torch_musa
 import tqdm
 from torch import nn
 from torch.utils.data import DataLoader
