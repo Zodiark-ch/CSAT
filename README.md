@@ -1,96 +1,59 @@
-<div align='center'>
- 
-# WAGLE: Strategic Weight Attribution for Effective and Modular Unlearning in Large Language Models
+# knowledge-neurons
+Code for the ACL-2022 paper "Knowledge Neurons in Pretrained Transformers"
 
-[![preprint](https://img.shields.io/badge/arXiv-2410.17509-B31B1B)](https://arxiv.org/pdf/2410.17509)
+# Introduction
 
-[![Venue:NeurIPS 2024](https://img.shields.io/badge/Venue-NeurIPS%202024-blue)](https://neurips.cc/Conferences/2024)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue)](https://github.com/OPTML-Group/WAGLE?tab=MIT-1-ov-file)
-[![GitHub top language](https://img.shields.io/github/languages/top/OPTML-Group/WAGLE)](https://github.com/OPTML-Group/WAGLE)
-[![GitHub repo size](https://img.shields.io/github/repo-size/OPTML-Group/WAGLE)](https://github.com/OPTML-Group/WAGLE)
-[![GitHub stars](https://img.shields.io/github/stars/OPTML-Group/WAGLE)](https://github.com/OPTML-Group/WAGLE)
+This project helps you to reproduce all the results presented in our work about knowledge neurons, including calculating the knowledge attribution scores, identifying knowledge neurons, computing all the statistics, and plotting all the figures.
 
-</div>
+# Code Usage
 
-This is the official code repository for the paper [WAGLE: Strategic Weight Attribution for Effective and Modular Unlearning in Large Language Models](https://arxiv.org/pdf/2410.17509).
+First please change the working directory to `src/`.
 
-## Abstract
+### Calculate the Attribution Scores
+Run `bash 1_run_mlm.sh param1`, where param1 is the relation name to analyze, such as "P101". You can write a script to run this command for each of the 34 relations. This command will calculate the attribution scores for all the facts.
 
-The need for effective unlearning mechanisms in large language models (LLMs) is increasingly urgent, driven by the necessity to adhere to data regulations and foster ethical generative AI practices. LLM unlearning is designed to reduce the impact of undesirable data influences and associated model capabilities without diminishing the utility of the model if unrelated to the information being forgotten. Despite growing interest, much of the existing research has focused on varied unlearning method designs to boost effectiveness and efficiency. However, the inherent relationship between model weights and LLM unlearning has not been extensively examined. In this paper, we systematically explore how model weights interact with unlearning processes in LLMs and we design the weight attribution-guided LLM unlearning method, WAGLE, which unveils the interconnections between 'influence' of weights and 'influence' of data to forget and retain in LLM generation. By strategically guiding the LLM unlearning across different types of unlearning methods and tasks, WAGLE can erase the undesired content, while maintaining the performance of the original tasks. We refer to the weight attribution-guided LLM unlearning method as WAGLE, which unveils the interconnections between 'influence' of weights and 'influence' of data to forget and retain in LLM generation. Our extensive experiments show that WAGLE boosts unlearning performance across a range of LLM unlearning methods such as gradient difference and (negative) preference optimization, applications such as fictitious unlearning (TOFU benchmark), malicious use prevention (WMDP benchmark), and copyrighted information removal, and models including Zephyr-7b-beta and Llama2-7b. To the best of our knowledge, our work offers the first principled method for attributing and pinpointing the influential weights in enhancing LLM unlearning. It stands in contrast to previous methods that lack weight attribution and simpler weight attribution techniques.
+### Identify Knowledge Neurons
+Run `bash 2_run_kn.sh`. This command will identify and refine knowledge neurons for each fact, and give their statistics along with a figure about the knowledge neuron distribution.
 
-<!-- <table align="center">
-  <tr>
-    <td align="center"> 
-      <img src="Images/teaser.png" alt="Teaser" style="width: 700px;"/> 
-      <br>
-      <em style="font-size: 18px;">  <strong style="font-size: 18px;">Figure 1:</strong> Systematic overview and experiment highlights of SimNPO.</em>
-    </td>
-  </tr>
-</table> -->
+### Modify Knowledge Neurons
+Run `3_run_modify_activation.sh`. This command will modify the activation values of knowledge neurons and record the corresponding results.
 
-## Installation
+### Check Knowledge Neuron Activation for Prompts
+Run `4_run_distant.sh`. This command will check the activation values of knowledge neurons for different types of prompts crawled from web pages.
 
-You can install the required dependencies using the following command:
+### Produce Activating Prompts
+Run `5_run_trigger_examples.sh`. This command will produce activating prompts.
+
+### Update Facts
+Run `6_run_edit.sh param1 param2`, where param1 and param2 are two hyper-parameters. In our paper, they are set to 1 and 8, respectively. This command will edit sampled facts.
+
+### Erase Relations
+Run `7_run_erase.sh param1`, where param1 is the relation name to erase. This command will erase a relation. In our paper, we try to erase P19, P27, P106, and P937, which can be regarded as privacy information. Of course, you can erase any relation as you like.
+
+### Plot Figures
+Run `8_run_plot.sh`. This command will plot two figures that visualize the results from `3_run_modify_activation.sh` and `4_run_distant.sh`.
+
+## Citation
+
+If you use this code for your research, please kindly cite our ACL-2022 paper:
 ```
-conda create -n WAGLE python=3.9
-conda activate WAGLE
-conda install pytorch==2.1.1 torchvision==0.16.1 torchaudio==2.1.1 pytorch-cuda=11.8 -c pytorch -c nvidia
-pip install datasets wandb transformers==4.37.2 sentencepiece sentence-transformers==2.6.1
-pip install git+https://github.com/jinghanjia/fastargs  
-pip install terminaltables sacrebleu rouge_score matplotlib seaborn scikit-learn
-cd lm-evaluation-harness
-pip install -e .
-```
-
-## WMDP Unlearned Models
-Please feel free to use the following models for your research:
-
-WAGLE+GradDiff: [🤗 flyingbugs/WMDP_GradDiff_WAGLE_Zephyr_7B](https://huggingface.co/flyingbugs/WMDP_GradDiff_WAGLE_Zephyr_7B)
-
-WAGLE+NPO: [🤗 flyingbugs/WMDP_NPO_WAGLE_Zephyr_7B](https://huggingface.co/flyingbugs/WMDP_NPO_WAGLE_Zephyr_7B)
-
-
-## Code structure
-
-```
--- configs/: Contains the configuration files for the experiments.
-    -- Different folders for different experiments (Tofu, WMDP, etc.)
--- files/: 
-    -- data/: Contains the data files necessary for the experiments.
-    -- results/: the log and results of experiments will stored in this directory.
--- lm-evaluation-harness: official repository for the evaluation of LLMs from      
-  https://github.com/EleutherAI/lm-evaluation-harness.
--- src/: Contains the source code for the experiments.
-    -- dataset/: Contains the data processing and dataloader creation codes.
-    -- model/: Contains the main unlearning class which will conduct load model, 
-      unlearn,evaluation.
-    -- optim/: Contains the optimizer code.
-    -- metrics/: Contains the evaluation code.
-    -- loggers/: Contains the logger code.
-    -- unlearn/: Contains different unlearning methods' code also mask generation code.
-    -- exec/:
-        -- Fine_tune_hp.py: Code for finetuning on harry potter books.
-        -- unlearn_model.py: The main file to run the unlearning experiments.
-```
-## Running the experiments
-
-First, you need to download the mask files from Google Drive and place them into ```./mask/``` directory. You can download the mask files from [here](https://drive.google.com/drive/folders/1yYzvroNHNKWrNWk0WOX_j4pXw4kIyEyf?usp=sharing). Those mask files name should be like ```{task_name}_{ratio}.pt```. For example, ```tofu_0.8.pt``` represents the mask file for TOFU task with 80% weights are selected for unlearning from WAGLE method.
-
-After downloading the mask files, you can run the following command to run the experiments:
-```
-python src/exec/unlearn_model.py --config_file configs/{unlearn_task}/{unlearn_method}.json --unlearn.mask_path mask/{unlearn_task}_{ratio}.pt {other_args}
-```
-
-
-<!---## Cite This Work
-```
-@misc{jia2024waglestrategicweightattribution,
-      title={WAGLE: Strategic Weight Attribution for Effective and Modular Unlearning in Large Language Models}, 
-      author={Jinghan Jia and Jiancheng Liu and Yihua Zhang and Parikshit Ram and Nathalie Baracaldo and Sijia Liu},
-      year={2024},
-      eprint={2410.17509},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2410.17509}, 
+@inproceedings{dai2022kn,
+  author    = {Damai Dai and
+               Li Dong and
+               Yaru Hao and
+               Zhifang Sui and
+               Baobao Chang and
+               Furu Wei},
+  title     = {Knowledge Neurons in Pretrained Transformers},
+  booktitle = {Proceedings of the 60th Annual Meeting of the Association for Computational
+               Linguistics (Volume 1: Long Papers), {ACL} 2022, Dublin, Ireland,
+               May 22-27, 2022},
+  pages     = {8493--8502},
+  year      = {2022},
 }
-```!--->
+```
+
+## Contact
+
+Damai Dai: daidamai@pku.edu.cn
+Li Dong: lidong1@microsoft.com

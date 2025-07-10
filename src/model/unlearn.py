@@ -4,7 +4,7 @@ import sys
 import transformers
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-sys.path.append("src")
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import torch
 from peft import  get_peft_model, LoraConfig
 from pruner.utils import WrappedGPT, find_layers
@@ -21,7 +21,7 @@ from metrics import (
 from optim import create_sophia_optimizer
 from unlearn import GenerateMask, get_unlearn_method
 
-
+#os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 class Unlearn:
     def __init__(self, model_name, cache_dir, **kwargs) -> None:
         self.model_name = model_name
@@ -61,7 +61,7 @@ class Unlearn:
             torch_dtype=torch.bfloat16,
             cache_dir=self.cache_dir,
             low_cpu_mem_usage=True,
-            device_map="auto",
+            device_map=None,
         )
         if self.use_lora:
             peft_config = LoraConfig(
@@ -79,20 +79,20 @@ class Unlearn:
         tokenizer = AutoTokenizer.from_pretrained(self.model_name, use_fast=False)
 
         if tokenizer.pad_token_id is None:
-            if self.if_llama:
+            if self.if_llama:#如果是llama系列的话用pad，不是的话用eos（这个还得看具体的模型）
                 tokenizer.add_special_tokens({"pad_token": "[pad]"})
 
             else:
                 tokenizer.pad_token = tokenizer.eos_token
                 model.config.pad_token_id = model.config.eos_token_id
         self.model = model
-        self.model.resize_token_embeddings(len(tokenizer))
+        self.model.resize_token_embeddings(len(tokenizer))#因为添加了pad，所以需要保证embedding大小和tokenizer大小相同
         self.tokenizer = tokenizer
         try:
-            self.device = torch.device("musa:0")
+            self.device = torch.device("cuda:0")
             #self.device = model.hf_device_map["lm_head"]
         except:
-            self.device = torch.device("musa:0")
+            self.device = torch.device("cuda:0")
 
     def init_dataset(self):
         unlearn_dataset, test_dataset, unlearn_collator, test_collator = get_dataset(
@@ -143,7 +143,7 @@ class Unlearn:
             report_to=[], 
         )
         if self.optimizer is not None:
-            self.unlearner = get_unlearn_method(
+            self.unlearner = get_unlearn_method(#unlearner根据不同的unlearn方法返回一个类，类里其实只有一个计算loss的函数，每个类计算loss的方法不同
                 name=self.unlearn_method,
                 model=self.model,
                 tokenizer=self.tokenizer,
@@ -188,10 +188,10 @@ class Unlearn:
                 self.if_wanda = True
             else:
                 self.if_wanda = False
-            if not self.if_wanda:
+            if not self.if_wanda:#如果不是 "wanda" 掩码，则遍历模型参数，将掩码 tensor 移动到模型参数所在的设备（通常是 GPU）
                 for key, tensor in self.model.named_parameters():
-                    self.mask[key] = self.mask[key].to(tensor.device)
-            else:
+                    self.mask[key] = self.mask[key].to(self.device)
+            else:#如果是 "wanda" 掩码，则遍历模型的每一层（layers），对每一层的权重掩码也做 device 的迁移，保证掩码和参数在同一设备上。
                 try:
                     layers = self.model.model.layers
                 except:
@@ -205,7 +205,7 @@ class Unlearn:
                             self.mask[cnt] = self.mask[cnt].to(subset[name].weight.device)
                             cnt+=1 
             return
-        else:
+        else:#掩码文件不存在，需要生成
             parts = self.mask_path.split("/")
             score_type = parts[-2]
             if score_type == "wanda":
@@ -220,7 +220,7 @@ class Unlearn:
                 mask_dir = self.mask_path.replace(f"with_{self.p}_{self.q}.pt", "")
             if not os.path.exists(mask_dir):
                 os.makedirs(mask_dir)
-            mask_args = transformers.TrainingArguments(
+            mask_args = transformers.TrainingArguments(#为掩码生成过程提供训练参数
                 per_device_train_batch_size=self.batch_size,
                 per_device_eval_batch_size=self.batch_size,
                 gradient_accumulation_steps=self.gradient_accumulation_steps,
@@ -239,7 +239,7 @@ class Unlearn:
                 output_dir=mask_dir,
                 report_to=[],
             )
-            if score_type == "wanda":
+            if score_type == "wanda":#如果是 "wanda" 掩码，重新生成一个 unlearn_dataset，调用 GenerateMask(...).get_mask() 生成掩码并赋值给 self.mask
                 unlearn_dataset,_,_,_ = get_dataset(
                     self.dataset_names,
                     self.tokenizer,
@@ -263,7 +263,7 @@ class Unlearn:
                     q=self.q,
                     mu=self.mu,
                 ).get_mask()
-            else:
+            else:#如果不是 "wanda"，直接调用 GenerateMask(...).get_mask()，但没有赋值给 self.mask
                 GenerateMask(
                     score_type=score_type,
                     ratios=[ratio],
@@ -279,7 +279,7 @@ class Unlearn:
                     q=self.q,
                     mu=self.mu,
                 ).get_mask()
-            if score_type == "snip_forget_reinit":
+            if score_type == "snip_forget_reinit":#如果 score_type 是 "snip_forget_reinit"，则直接将 self.mask 设为 None，并删除掩码文件
                 self.mask = None
                 os.system(f"rm -rf {self.mask_path}")
                 return

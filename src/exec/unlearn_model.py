@@ -11,12 +11,12 @@ from fastargs import Param, Section, get_current_config
 from fastargs.decorators import param
 from fastargs.validation import BoolAsInt, File, Folder, OneOf
 
-sys.path.append("src")
-
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 Section("overall", "Overall configs").params(
     model_name=Param(str, required=True, default="locuslab/tofu_ft_llama2-7b", desc="Model name"),
     logger=Param(OneOf(["json", "none"]), default="json", desc="Logger to use"),
-    cache_dir=Param(Folder(True), default="/root/autodl-tmp/.cache", desc="Cache directory"),
+    cache_dir=Param(Folder(True), default="/data/zodiark/CSAT/.cache", desc="Cache directory"),
     seed=Param(int, default=0, desc="Random seed"),
 )
 
@@ -48,7 +48,7 @@ Section("unlearn", "Unlearning configs").params(
     gradient_accumulation_steps=Param(
         int, default=4, desc="Gradient accumulation steps"
     ),
-    mask_path=Param(str, default="/root/autodl-tmp/wagle_mak/tofu_0.95-001.pt", desc="Path to mask file"),
+    mask_path=Param(str, default="/data/zodiark/CSAT/tofu_0.95-001.pt", desc="Path to mask file"),
     task_name=Param(
         OneOf(["toxic", "copyright", "tofu", "wmdp"]),
         default="tofu",
@@ -135,8 +135,9 @@ Section("logger", "General logger configs").params(
 Section("logger.json", "JSON logger").enable_if(
     lambda cfg: cfg["overall.logger"] == "json"
 ).params(
-    root=Param(Folder(True), default="files/logs", desc="Path to log folder"),
+    root=Param(Folder(True), default="/data/zodiark/CSAT/files/logs", desc="Path to log folder"),
 )
+
 
 
 class Main:
@@ -150,12 +151,12 @@ class Main:
     def make_config(self, quiet=False):
         self.config = get_current_config()
         parser = argparse.ArgumentParser("LLM unlearning")
-        self.config.augment_argparse(parser)
-        self.config.collect_argparse_args(parser)
+        self.config.augment_argparse(parser)#可以直接导入config文件进行配置
+        self.config.collect_argparse_args(parser)#将多个config.json和命令行参数进行合并整合成一个config，优先级最高的是命令行参数>config>环境变量>default值
 
-        self.config.validate()
+        self.config.validate()#遍历所有参数触发类型检查和必填项检查
         if not quiet:
-            self.config.summary()
+            self.config.summary()#以表格的形式print出所有参数
 
     @param("overall.seed")
     def setup_seed(self, seed: int):
@@ -180,10 +181,10 @@ class Main:
             "forget": kwargs["forget_dataset_name"],
             "retain": kwargs["retain_dataset_name"],
         }
-        self.model = import_module(f"model.unlearn").get(**kwargs)
+        self.model = import_module(f"model.unlearn").get(**kwargs)#这个model.unlearn字符串代表的就是model文件夹中unlearn这个py文件
 
     @param("overall.logger")
-    def init_logger(self, logger):
+    def init_logger(self, logger):#这个logger的值是通过@param("overall.logger")传入的
         kwargs = self.config.get_section(f"logger")
         kwargs.update(self.config.get_section(f"logger.{logger}"))
         kwargs["config"] = self.config.get_all_config()

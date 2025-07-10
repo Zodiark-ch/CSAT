@@ -1,11 +1,13 @@
 import random
 import sys
+import os
 
 import torch
 import tqdm
 from transformers import AutoModelForCausalLM, AutoTokenizer, pipeline
 from scipy.stats import ks_2samp
-sys.path.append("src")
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import difflib
 import json
 import sacrebleu
@@ -22,7 +24,9 @@ from sklearn.metrics import roc_auc_score
 from datasets import concatenate_datasets
 from collections import defaultdict
 
-with open("files/data/authors.json") as f:
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+authors_path = os.path.join(base_dir, "files/data/authors.json")
+with open(authors_path) as f:
     authors = json.load(f)
     Name = authors["Name"]
 
